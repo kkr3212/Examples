@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Aegis id="10100" logLevel="2">
+  <CustomData>
+    <SystemDB dbname="rpggame_systemdb"
+              ipaddress="127.0.0.1"
+              portno="3306"
+              userid="root"
+              userpwd="1111" />
+
+    <AES IV="NP_Contents_001 "
+         Key="#@a73S  ls$#che_" />
+
+  </CustomData>
+</Aegis>
