@@ -91,6 +91,6 @@ namespace RPGGame.Common
 
     public static class Definitions
     {
-        public const Int32 BuildNo = 151117;
+        public const Int32 BuildNo = 151118;
     }
 }

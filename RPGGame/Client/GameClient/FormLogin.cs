@@ -46,12 +46,12 @@ namespace GameClient
 
         private void OnClick_RefreshWorldList(object sender, EventArgs e)
         {
-            NetworkAPI.Requester.SetAuthServer(_tbServerIp.Text, _tbPortNo.Text.ToInt32());
+            Requester.SetAuthServer(_tbServerIp.Text, _tbPortNo.Text.ToInt32());
 
 
             //  접속 가능한 World 목록 요청
             _lvWorld.Items.Clear();
-            NetworkAPI.Requester.Auth_WorldList((response) =>
+            Requester.Auth_WorldList((response) =>
             {
                 foreach (var info in response.Items)
                 {
@@ -74,7 +74,7 @@ namespace GameClient
         private void OnClick_Register(object sender, EventArgs e)
         {
             //  UserToken으로 가입 요청
-            NetworkAPI.Requester.Auth_RegisterGuest(_tbUserToken.Text, (response) =>
+            Requester.Auth_RegisterGuest(_tbUserToken.Text, (response) =>
             {
                 if (response.ResultCodeNo != ResultCode.Ok)
                 {
@@ -100,7 +100,7 @@ namespace GameClient
 
 
             //  UserToken을 사용해 로그인 요청
-            NetworkAPI.Requester.Auth_LoginGuest(worldId, UserToken, (response) =>
+            Requester.Auth_LoginGuest(worldId, UserToken, (response) =>
             {
                 if (response.ResultCodeNo == ResultCode.Ok)
                     UIViews.ChangeView<FormGameMain>();
