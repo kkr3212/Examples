@@ -3,16 +3,19 @@
 
 
 # RPGGame
-RPGGame/Common/bin
-RPGGame/Common/obj
+RPGGame/Server/Common/bin
+RPGGame/Server/Common/obj
 
-RPGGame/AuthServer/bin
-RPGGame/AuthServer/obj
+RPGGame/Server/AuthServer/bin
+RPGGame/Server/AuthServer/obj
 
-RPGGame/GameServer/bin
-RPGGame/GameServer/obj
+RPGGame/Server/GameServer/bin
+RPGGame/Server/GameServer/obj
 
-RPGGame/GameClient/bin
-RPGGame/GameClient/obj
+RPGGame/Client/GameClient/bin
+RPGGame/Client/GameClient/obj
+
+RPGGame/Client/NetworkAPI/bin
+RPGGame/Client/NetworkAPI/obj
 
 RPGGame/bin/MySql
