@@ -2,20 +2,32 @@
 *.csproj.user
 
 
+
+
+
+#EchoTest
+EchoTest/EchoClient/bin
+EchoTest/EchoClient/obj
+EchoTest/EchoClient_Connector/bin
+EchoTest/EchoClient_Connector/obj
+EchoTest/EchoServer/bin
+EchoTest/EchoServer/obj
+EchoTest/EchoServer_Starter/bin
+EchoTest/EchoServer_Starter/obj
+
+
+
+
+
 # RPGGame
 RPGGame/Server/Common/bin
 RPGGame/Server/Common/obj
-
 RPGGame/Server/AuthServer/bin
 RPGGame/Server/AuthServer/obj
-
 RPGGame/Server/GameServer/bin
 RPGGame/Server/GameServer/obj
-
 RPGGame/Client/GameClient/bin
 RPGGame/Client/GameClient/obj
-
 RPGGame/Client/NetworkAPI/bin
 RPGGame/Client/NetworkAPI/obj
-
 RPGGame/bin/MySql

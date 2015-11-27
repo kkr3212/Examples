@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Aegis id="21301" logLevel="2" mutexName="TestServer">
+  <NetworkChannel name="NetworkClient"
+                  sessionClass="EchoServer.Logic.ClientSession"
+                  initSessionPoolCount="5"
+                  maxSessionPoolCount="100"
+                  listenIpAddress="127.0.0.1"
+                  listenPortNo="10100" />
+</Aegis>

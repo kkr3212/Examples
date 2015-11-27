@@ -27,13 +27,13 @@ namespace RPGGame.GameServer.ServerSystem
         }
 
 
-        override protected void OnStart(string[] args)
+        protected override void OnStart(string[] args)
         {
             StartServer(null);
         }
 
 
-        override protected void OnStop()
+        protected override void OnStop()
         {
             StopServer();
         }
