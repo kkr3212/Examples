@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using Aegis;
+using Aegis.Utils;
 using Aegis.Network;
 
 

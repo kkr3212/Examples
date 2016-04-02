@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Aegis;
-using Aegis.Data.MySql;
+using Aegis.Utils;
 using RPGGame.Common;
 using RPGGame.GameServer.ServerSystem;
 

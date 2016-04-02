@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Aegis;
-using Aegis.Data.MySql;
+using MySql.Data.MySqlClient;
 
 
 
@@ -67,7 +67,7 @@ namespace RPGGame.GameServer.UserData
         }
 
 
-        public void LoadFromDB(DataReader reader)
+        public void LoadFromDB(MySqlDataReader reader)
         {
             Items.Clear();
             while (reader.Read())

@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using Aegis;
-using Aegis.Converter;
-using Aegis.Data.MySql;
+using Aegis.Utils.Converter;
+using Aegis.Data.MySQL;
 using RPGGame.Common;
 using RPGGame.GameServer.GameData;
 

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Aegis.Data.MySql;
+using Aegis.Data.MySQL;
 using RPGGame.Common;
+using MySql.Data.MySqlClient;
 
 
 
@@ -28,7 +29,7 @@ namespace RPGGame.AuthServer
             Items.Clear();
 
             using (DBCommand cmd = SystemDB.NewCommand())
-            using (DataReader reader = cmd.Query("select worldid, worldname, isopen from t_listworld;"))
+            using (MySqlDataReader reader = cmd.Query("select worldid, worldname, isopen from t_listworld;"))
             {
                 while (reader.Read())
                 {

@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Aegis.Network;
-using Aegis.Data.MySql;
+using Aegis.Data.MySQL;
+using MySql.Data.MySqlClient;
 
 
 
@@ -61,7 +62,7 @@ namespace RPGGame.Common
                 cmd.CommandText.Append("select uid, worldid, servertype, servername, system_ipaddress, listen_ipaddress, listen_portno");
                 cmd.CommandText.Append(" from t_listserver;");
 
-                DataReader reader = cmd.Query();
+                MySqlDataReader reader = cmd.Query();
                 while (reader.Read())
                 {
                     Items.Add(new ServerInfo()

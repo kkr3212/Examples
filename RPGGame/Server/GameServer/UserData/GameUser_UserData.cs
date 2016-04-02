@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Aegis;
-using Aegis.Data.MySql;
+using Aegis.Data.MySQL;
 using RPGGame.Common;
 using RPGGame.GameServer.GameData;
 

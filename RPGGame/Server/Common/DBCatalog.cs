@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Aegis;
-using Aegis.Data.MySql;
-using Aegis.Converter;
+using Aegis.Data.MySQL;
+using Aegis.Utils.Converter;
+using MySql.Data.MySqlClient;
 
 
 
@@ -50,13 +51,13 @@ namespace RPGGame.Common
             String userId = Starter.CustomData.GetValue("SystemDB/userid");
             String userPwd = Starter.CustomData.GetValue("SystemDB/userpwd");
 
-            MySqlDatabase systemDB = new MySqlDatabase(dbHost, dbPort, "", dbName, userId, userPwd);
+            ConnectionPool systemDB = new ConnectionPool(dbHost, dbPort, "", dbName, userId, userPwd);
             using (DBCommand cmd = new DBCommand(systemDB))
             {
                 cmd.CommandText.Append("select uid, worldid, dbtype, dbname, ipaddress, portno, userid, passwd");
                 cmd.CommandText.Append(", charset, shardkey_start, shardkey_end");
                 cmd.CommandText.Append(" from t_listdb;");
-                DataReader reader = cmd.Query();
+                MySqlDataReader reader = cmd.Query();
 
                 while (reader.Read())
                 {
@@ -108,14 +109,14 @@ namespace RPGGame.Common
     public static class SystemDB
     {
         public static DBInfo DBInfo { get; private set; }
-        public static MySqlDatabase MySql { get; internal set; }
+        public static ConnectionPool MySql { get; internal set; }
         public static Int32 TotalQPS { get { return MySql.GetTotalQPS(); } }
 
 
         internal static void Initialize(DBInfo info)
         {
             DBInfo = info;
-            MySql = new MySqlDatabase(DBInfo.IPAddress, DBInfo.PortNo, DBInfo.CharSet, DBInfo.DBName, DBInfo.UserId, DBInfo.UserPwd);
+            MySql = new ConnectionPool(DBInfo.IPAddress, DBInfo.PortNo, DBInfo.CharSet, DBInfo.DBName, DBInfo.UserId, DBInfo.UserPwd);
         }
 
 
@@ -142,14 +143,14 @@ namespace RPGGame.Common
     public static class AuthDB
     {
         public static DBInfo DBInfo { get; private set; }
-        public static MySqlDatabase MySql { get; internal set; }
+        public static ConnectionPool MySql { get; internal set; }
         public static Int32 TotalQPS { get { return MySql.GetTotalQPS(); } }
 
 
         internal static void Initialize(DBInfo info)
         {
             DBInfo = info;
-            MySql = new MySqlDatabase(DBInfo.IPAddress, DBInfo.PortNo, DBInfo.CharSet, DBInfo.DBName, DBInfo.UserId, DBInfo.UserPwd);
+            MySql = new ConnectionPool(DBInfo.IPAddress, DBInfo.PortNo, DBInfo.CharSet, DBInfo.DBName, DBInfo.UserId, DBInfo.UserPwd);
         }
 
 
@@ -175,8 +176,8 @@ namespace RPGGame.Common
 
     public static class GameDB
     {
-        private static List<Tuple<DBInfo, MySqlDatabase>> _listDB = new List<Tuple<DBInfo, MySqlDatabase>>();
-        public static List<MySqlDatabase> MySqls { get { return _listDB.Select(v => v.Item2).ToList(); } }
+        private static List<Tuple<DBInfo, ConnectionPool>> _listDB = new List<Tuple<DBInfo, ConnectionPool>>();
+        public static List<ConnectionPool> MySqls { get { return _listDB.Select(v => v.Item2).ToList(); } }
         public static Int32 TotalQPS
         {
             get
@@ -192,8 +193,8 @@ namespace RPGGame.Common
 
         internal static void AddDBInfo(DBInfo info)
         {
-            MySqlDatabase mysql = new MySqlDatabase(info.IPAddress, info.PortNo, info.CharSet, info.DBName, info.UserId, info.UserPwd);
-            Tuple<DBInfo, MySqlDatabase> data = new Tuple<DBInfo, MySqlDatabase>(info, mysql);
+            ConnectionPool mysql = new ConnectionPool(info.IPAddress, info.PortNo, info.CharSet, info.DBName, info.UserId, info.UserPwd);
+            Tuple<DBInfo, ConnectionPool> data = new Tuple<DBInfo, ConnectionPool>(info, mysql);
             _listDB.Add(data);
         }
 
@@ -207,7 +208,7 @@ namespace RPGGame.Common
         }
 
 
-        public static MySqlDatabase GetMySql(Int32 shardKey)
+        public static ConnectionPool GetMySql(Int32 shardKey)
         {
             foreach (var data in _listDB)
             {

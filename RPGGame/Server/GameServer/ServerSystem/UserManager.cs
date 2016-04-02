@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Aegis;
-using Aegis.Converter;
+using Aegis.Utils.Converter;
 using Aegis.Threading;
-using Aegis.Data.MySql;
+using Aegis.Data.MySQL;
 using RPGGame.Common;
 using RPGGame.GameServer.UserData;
 
@@ -41,7 +41,7 @@ namespace RPGGame.GameServer.ServerSystem
             _maxAliveSecond = Starter.CustomData.GetValue("UserManager/maxAliveSecond").ToInt32();
 
             _users = new Dictionary<Int32, UserData>();
-            _thread = ThreadCancellable.CallPeriodically(1000, CheckExpiredUser);
+            _thread = ThreadCancellable.CallInterval(1000, CheckExpiredUser);
         }
 
 

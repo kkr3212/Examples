@@ -5,6 +5,7 @@ using System.Text;
 using System.ServiceProcess;
 using System.Windows.Forms;
 using Aegis;
+using Aegis.Utils;
 using RPGGame.Common;
 
 

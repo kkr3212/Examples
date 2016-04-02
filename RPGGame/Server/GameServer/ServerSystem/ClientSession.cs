@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Aegis;
 using Aegis.Network;
+using Aegis.Utils;
 using RPGGame.Common;
 using RPGGame.GameServer.UserData;
 

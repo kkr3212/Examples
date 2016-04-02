@@ -6,6 +6,7 @@ using Aegis;
 using Aegis.Network;
 using Aegis.Threading;
 using RPGGame.Common;
+using Aegis.Utils;
 
 
 
@@ -64,7 +65,7 @@ namespace RPGGame.GameServer.ServerSystem
                 Logger.Write(LogType.Info, 2, "Connected to the AuthServer.");
 
 
-                _threadRun = ThreadCancellable.CallPeriodically(1000, () =>
+                _threadRun = ThreadCancellable.CallInterval(1000, () =>
                 {
                     PacketRequest ntfPacket = new PacketRequest(Protocol.GetID("SS_Traffic_Ntf"));
                     ntfPacket.PutInt32(Statistics.CCU);
