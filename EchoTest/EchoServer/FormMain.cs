@@ -16,12 +16,6 @@ namespace EchoServer
 {
     public partial class FormMain : Form
     {
-        private Aegis.Threading.ThreadCancellable _threadUpdate;
-
-
-
-
-
         public FormMain()
         {
             InitializeComponent();
@@ -39,7 +33,7 @@ namespace EchoServer
             _tbLog.Text = "";
 
             ServerMain.StartServer(_tbLog);
-            _threadUpdate = Aegis.Threading.ThreadCancellable.CallPeriodically(100, UpdateStatistics);
+            (new Aegis.Calculate.IntervalTimer("Update", 100, UpdateStatistics)).Start();
         }
 
 
@@ -48,30 +42,27 @@ namespace EchoServer
             _btnStart.Enabled = true;
             _btnStop.Enabled = false;
 
-            _threadUpdate.Cancel();
+            Aegis.Calculate.IntervalTimer.Timers["Update"].Dispose();
             ServerMain.StopServer();
         }
 
 
         private void OnFormClosed(object sender, FormClosedEventArgs e)
         {
-            _btnStart.Enabled = true;
-            _btnStop.Enabled = false;
-
-            _threadUpdate.Cancel();
+            OnClick_Stop(null, null);
             ServerMain.StopServer();
         }
 
 
-        private Boolean UpdateStatistics()
+        private void UpdateStatistics()
         {
             if (InvokeRequired)
                 Invoke((MethodInvoker)delegate { UpdateStatistics(); });
             else
             {
-                Int32 sessionCount = ServerMain.GetActiveSessionCount();
-                Int32 receiveCount = ClientSession.Counter_ReceiveCount.Value;
-                Int32 receiveBytes = ClientSession.Counter_ReceiveBytes.Value;
+                int sessionCount = ServerMain.GetActiveSessionCount();
+                int receiveCount = Aegis.Calculate.IntervalCounter.Counters["ReceiveCount"].Value;
+                int receiveBytes = Aegis.Calculate.IntervalCounter.Counters["ReceiveBytes"].Value;
 
 
                 _lbActiveSession.Text = String.Format("{0:N0}", sessionCount);
@@ -79,8 +70,6 @@ namespace EchoServer
                 _lbReceiveBytes.Text = String.Format("{0:N0}", receiveBytes);
                 _lbTaskCount.Text = Aegis.Threading.AegisTask.TaskCount.ToString();
             }
-
-            return true;
         }
     }
 }

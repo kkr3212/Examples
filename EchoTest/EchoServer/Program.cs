@@ -14,9 +14,31 @@ namespace EchoServer
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormMain());
+            if (Environment.UserInteractive)
+            {
+                Aegis.Framework.Running += () =>
+                {
+                    Application.EnableVisualStyles();
+                    Application.SetCompatibleTextRenderingDefault(false);
+                    Application.Run(new FormMain());
+                };
+
+                Aegis.Framework.Start(false);
+            }
+            else
+            {
+                Aegis.Framework.Initialized += (args) =>
+                {
+                    Logic.ServerMain.StartServer(null);
+                    return true;
+                };
+                Aegis.Framework.Finalizing += () =>
+                {
+                    Logic.ServerMain.StopServer();
+                };
+
+                Aegis.Framework.Start(true);
+            }
         }
     }
 }

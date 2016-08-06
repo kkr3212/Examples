@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Aegis;
-using Aegis.Threading;
+using Aegis.IO;
+using Aegis.Calculate;
 using Aegis.Network;
 
 
@@ -13,25 +14,29 @@ namespace EchoServer.Logic
 {
     public class ClientSession : Session
     {
-        public static IntervalCounter Counter_ReceiveCount = new IntervalCounter(1000);
-        public static IntervalCounter Counter_ReceiveBytes = new IntervalCounter(1000);
-
-
-
-
-
         public ClientSession()
         {
-            base.NetworkEvent_Accepted += OnAcceptd;
-            base.NetworkEvent_Closed += OnClosed;
-            base.NetworkEvent_Received += OnReceived;
+            base.EventAccept += OnAcceptd;
+            base.EventClose += OnClosed;
+            base.EventReceive += OnReceived;
             base.PacketValidator += Packet.IsValidPacket;
+
+            CreatePacketDispatcher(this, (ref object source, out int key) =>
+            {
+                source = new Packet(source as StreamBuffer);
+                key = (source as Packet).PacketId;
+                (source as Packet).SkipHeader();
+
+
+                IntervalCounter.Counters["ReceiveCount"].Add(1);
+                IntervalCounter.Counters["ReceiveBytes"].Add((source as Packet).Buffer.Length);
+            });
         }
 
 
-        private void OnAcceptd(Session session)
+        private void OnAcceptd(IOEventResult result)
         {
-            Logger.Write(LogType.Info, 2, "[{0}] Accepted", SessionId);
+            Logger.Info("[{0}] Accepted", SessionId);
 
 
             //  Hello packet을 클라이언트에 전달
@@ -40,27 +45,24 @@ namespace EchoServer.Logic
         }
 
 
-        private void OnClosed(Session session)
+        private void OnClosed(IOEventResult result)
         {
-            Logger.Write(LogType.Info, 2, "[{0}] Closed", SessionId);
+            Logger.Info("[{0}] Closed", SessionId);
         }
 
 
-        private void OnReceived(Session session, StreamBuffer buffer)
+        private void OnReceived(IOEventResult result)
         {
-            Counter_ReceiveCount.Add(1);
-            Counter_ReceiveBytes.Add(buffer.WrittenBytes);
+            IntervalCounter.Counters["ReceiveCount"].Add(1);
+            IntervalCounter.Counters["ReceiveBytes"].Add(result.Buffer.Length);
 
 
-            Packet packet = new Packet(buffer);
-            packet.SkipHeader();
-            switch (packet.PacketId)
-            {
-                case 0x02: OnEcho_Req(packet); break;
-            }
+            Packet packet = new Packet(result.Buffer);
+            Logger.Err("Invalid packet received(PacketId={0:X}", packet.PacketId);
         }
 
 
+        [TargetMethod(0x02)]
         private void OnEcho_Req(Packet packet)
         {
             Packet resPacket = new Packet(0x03);

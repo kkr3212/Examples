@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Aegis;
 using Aegis.Network;
+using Aegis.Calculate;
 
 
 
@@ -16,32 +17,41 @@ namespace EchoServer.Logic
         {
             try
             {
-                LogMedia.SetTextBoxLogger(ctrl);
-                Logger.Write(LogType.Info, 2, "EchoServer (AegisNetwork {0})", Aegis.Configuration.Environment.AegisVersion);
+                LogMedia.AddTextBoxLogger(ctrl);
+                Logger.Info("EchoServer (AegisNetwork {0})", Aegis.Framework.AegisVersion);
 
-                Starter.Initialize();
-                Starter.CreateNetworkChannel("ClientNetwork")
-                       .StartNetwork(delegate { return new ClientSession(); }, 1, 100)
-                       .OpenListener("127.0.0.1", 10100);
+
+                (new IntervalCounter("ReceiveCount", 1000)).Start();
+                (new IntervalCounter("ReceiveBytes", 1000)).Start();
+
+
+                var channel = NetworkChannel.CreateChannel("ClientNetwork");
+                channel.SessionGenerator = () => { return new ClientSession(); };
+                channel.MaxSessionCount = 100;
+                channel.Acceptor.ListenIpAddress = "127.0.0.1";
+                channel.Acceptor.ListenPortNo = 10100;
+                channel.Acceptor.Listen();
             }
             catch (Exception e)
             {
-                Logger.Write(LogType.Err, 2, e.ToString());
+                Logger.Err(e.ToString());
             }
         }
 
 
         public static void StopServer()
         {
-            Starter.StopNetwork("ClientNetwork");
-            Starter.Release();
+            NetworkChannel.Release();
             LogMedia.DeleteAllLogger();
+
+            IntervalCounter.Counters["ReceiveCount"].Dispose();
+            IntervalCounter.Counters["ReceiveBytes"].Dispose();
         }
 
 
-        public static Int32 GetActiveSessionCount()
+        public static int GetActiveSessionCount()
         {
-            NetworkChannel channel = NetworkChannel.Channels.Find(v => v.Name == "ClientNetwork");
+            NetworkChannel channel = NetworkChannel.Channels["ClientNetwork"];
             return channel?.ActiveSessions.Count ?? 0;
         }
     }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Aegis;
-using Aegis.Threading;
+using Aegis.IO;
 using Aegis.Network;
 
 
@@ -21,43 +21,57 @@ namespace EchoClient.Logic
 
         public TestSession()
         {
-            base.NetworkEvent_Connected += OnConnected;
-            base.NetworkEvent_Closed += OnClosed;
-            base.NetworkEvent_Received += OnReceived;
+            base.EventConnect += OnConnected;
+            base.EventClose += OnClosed;
+            base.EventReceive += OnReceived;
             base.PacketValidator += Packet.IsValidPacket;
 
+            CreatePacketDispatcher(this, (ref object source, out int key) =>
+            {
+                source = new Packet(source as StreamBuffer);
+                key = (source as Packet).PacketId;
+                (source as Packet).SkipHeader();
+            });
+        }
 
+
+        public void Connect()
+        {
             Connect("127.0.0.1", 10100);
         }
 
 
-        private void OnConnected(Session session, Boolean connected)
+        private void OnConnected(IOEventResult result)
         {
-            if (connected == true)
-                Logger.Write(LogType.Info, 2, "[{0}] Connected", SessionId);
+            if (result.Result == AegisResult.Ok)
+                Logger.Info("[{0}] Connected", SessionId);
             else
                 Connect("127.0.0.1", 10100);
         }
 
 
-        private void OnClosed(Session session)
+        private void OnClosed(IOEventResult result)
         {
-            Logger.Write(LogType.Info, 2, "[{0}] Closed", SessionId);
-        }
-
-
-        private void OnReceived(Session session, StreamBuffer buffer)
-        {
-            Packet packet = new Packet(buffer);
-            packet.SkipHeader();
-            switch (packet.PacketId)
+            if (result.Result == AegisResult.Ok)
             {
-                case 0x01: OnHello(packet); break;
-                case 0x03: OnEcho_Res(packet); break;
+                Logger.Info("[{0}] Closed", SessionId);
+            }
+            else
+            {
+                Logger.Info("[{0}] Closed by remote.", SessionId);
+                Connect("127.0.0.1", 10100);
             }
         }
 
 
+        private void OnReceived(IOEventResult result)
+        {
+            Packet packet = new Packet(result.Buffer);
+            Logger.Err("Invalid packet received(PacketId={0:X}", packet.PacketId);
+        }
+
+
+        [TargetMethod(0x01)]
         private void OnHello(Packet packet)
         {
             Packet reqPacket = new Packet(0x02);
@@ -66,6 +80,7 @@ namespace EchoClient.Logic
         }
 
 
+        [TargetMethod(0x03)]
         private void OnEcho_Res(Packet packet)
         {
             Packet reqPacket = new Packet(0x02);
@@ -74,10 +89,10 @@ namespace EchoClient.Logic
 
             SendPacket(reqPacket,
                         (buffer) => { return Packet.GetPacketId(buffer.Buffer) == 0x03; },
-                        (session, buffer) =>
+                        (result) =>
                         {
                             packet.SkipHeader();
-                            OnEcho_Res(new Packet(buffer));
+                            OnEcho_Res(new Packet(result.Buffer));
                         }
                 );
         }
