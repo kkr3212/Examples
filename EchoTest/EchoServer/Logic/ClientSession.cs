@@ -21,10 +21,10 @@ namespace EchoServer.Logic
             base.EventReceive += OnReceived;
             base.PacketValidator += Packet.IsValidPacket;
 
-            CreatePacketDispatcher(this, (ref object source, out int key) =>
+            CreatePacketDispatcher(this, (ref StreamBuffer source, out string key) =>
             {
                 source = new Packet(source as StreamBuffer);
-                key = (source as Packet).PacketId;
+                key = (source as Packet).PacketId.ToString();
                 (source as Packet).SkipHeader();
 
 
@@ -40,7 +40,7 @@ namespace EchoServer.Logic
 
 
             //  Hello packet을 클라이언트에 전달
-            Packet packet = new Packet(0x01);
+            Packet packet = new Packet(Protocol.Hello_Ntf);
             SendPacket(packet);
         }
 
@@ -58,14 +58,14 @@ namespace EchoServer.Logic
 
 
             Packet packet = new Packet(result.Buffer);
-            Logger.Err("Invalid packet received(PacketId={0:X}", packet.PacketId);
+            Logger.Err("Invalid packet received(PacketId={0:X})", packet.PacketId);
         }
 
 
-        [TargetMethod(0x02)]
-        private void OnEcho_Req(Packet packet)
+        [TargetMethod(Protocol.Echo_Req)]
+        private void Echo_Req(Packet packet)
         {
-            Packet resPacket = new Packet(0x03);
+            Packet resPacket = new Packet(Protocol.Echo_Res);
             SendPacket(resPacket);
         }
     }

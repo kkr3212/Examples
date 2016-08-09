@@ -41,11 +41,11 @@ namespace EchoServer.Logic
 
         public static void StopServer()
         {
+            IntervalCounter.Counters["ReceiveCount"]?.Dispose();
+            IntervalCounter.Counters["ReceiveBytes"]?.Dispose();
+
             NetworkChannel.Release();
             LogMedia.DeleteAllLogger();
-
-            IntervalCounter.Counters["ReceiveCount"].Dispose();
-            IntervalCounter.Counters["ReceiveBytes"].Dispose();
         }
 
 

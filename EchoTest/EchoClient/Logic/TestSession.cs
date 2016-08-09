@@ -26,10 +26,10 @@ namespace EchoClient.Logic
             base.EventReceive += OnReceived;
             base.PacketValidator += Packet.IsValidPacket;
 
-            CreatePacketDispatcher(this, (ref object source, out int key) =>
+            CreatePacketDispatcher(this, (ref StreamBuffer source, out string key) =>
             {
                 source = new Packet(source as StreamBuffer);
-                key = (source as Packet).PacketId;
+                key = (source as Packet).PacketId.ToString();
                 (source as Packet).SkipHeader();
             });
         }
@@ -67,32 +67,32 @@ namespace EchoClient.Logic
         private void OnReceived(IOEventResult result)
         {
             Packet packet = new Packet(result.Buffer);
-            Logger.Err("Invalid packet received(PacketId={0:X}", packet.PacketId);
+            Logger.Err("Invalid packet received(PacketId={0:X})", packet.PacketId);
         }
 
 
-        [TargetMethod(0x01)]
-        private void OnHello(Packet packet)
+        [TargetMethod(Protocol.Hello_Ntf)]
+        private void Hello_Ntf(Packet packet)
         {
-            Packet reqPacket = new Packet(0x02);
+            Packet reqPacket = new Packet(Protocol.Echo_Req);
             reqPacket.Write(_tempBuffer, 0, FormMain.BufferSize);
             SendPacket(reqPacket);
         }
 
 
-        [TargetMethod(0x03)]
-        private void OnEcho_Res(Packet packet)
+        [TargetMethod(Protocol.Echo_Res)]
+        private void Echo_Res(Packet packet)
         {
-            Packet reqPacket = new Packet(0x02);
+            Packet reqPacket = new Packet(Protocol.Echo_Req);
             reqPacket.Write(_tempBuffer, 0, FormMain.BufferSize);
 
 
             SendPacket(reqPacket,
-                        (buffer) => { return Packet.GetPacketId(buffer.Buffer) == 0x03; },
+                        (buffer) => { return Packet.GetPacketId(buffer.Buffer) == Protocol.Echo_Res; },
                         (result) =>
                         {
                             packet.SkipHeader();
-                            OnEcho_Res(new Packet(result.Buffer));
+                            Echo_Res(new Packet(result.Buffer));
                         }
                 );
         }
